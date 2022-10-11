@@ -1,0 +1,6 @@
+# Directories
+venv/
+.idea/
+
+# Files
+token.txt
