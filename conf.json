@@ -1,0 +1,23 @@
+{
+  "text": [
+    {
+      "creating_ticket_system": "Creating a ticket system...",
+      "create_ticket": "Click on the button to create a ticket",
+      "ticket_created": "Ticket created!",
+      "clear": "Deleting {amount} messages",
+      "value_big_or_small": "Value has to be **more than 1** and **less than 1000**",
+      "incorrect_value": "Incorrect value entered. Amount **must be a digit**"
+    }
+  ],
+  "commands": [
+    {
+      "create_ticket_system": "Creates a ticket system and sends initial message",
+      "clear": "Deletes specified amount of messages above"
+    }
+  ],
+  "buttons": [
+    {
+      "create_ticket": "\uD83D\uDCE8Create Ticket"
+    }
+  ]
+}

@@ -1,11 +1,17 @@
 import discord
 import time
+import json
 from discord import app_commands
 from pathlib import Path
 
 from Tools.Tickets import TicketSystem
+from Tools.Config import Config
 
 TOKEN = Path("token.txt").read_text()  # file gitignored
+
+with open("conf.json", "r") as f:
+    config = Config(json.load(f))
+
 
 
 class Client(discord.Client):
@@ -29,9 +35,9 @@ client = Client(intents=intents)
 commands = app_commands.CommandTree(client)
 
 
-@commands.command(name="create_ticket_system", description="Creates a ticket system and sends initial message")
+@commands.command(name="create_ticket_system", description=config.commands["create_ticket_system"])
 async def self(ctx: discord.Interaction):
-    await ctx.response.send_message("Creating a ticket system...")
+    await ctx.response.send_message(config.text["creating_ticket_system"])
     time.sleep(2)
     await ctx.channel.purge(limit=1)
 
@@ -39,16 +45,16 @@ async def self(ctx: discord.Interaction):
     await ticket.create()
 
 
-@commands.command(name="clear", description="Deletes specified amount of messages above")
+@commands.command(name="clear", description=config.commands["clear"])
 async def test(ctx: discord.Interaction, amount: str):
     try:
         if not 0 < int(amount) < 1000:
-            await ctx.response.send_message("Value has to be **more than 1** and **less than 1000**")
+            await ctx.response.send_message(config.text["value_big_or_small"])
             return
         amount = int(amount)
-        await ctx.response.send_message(f"Deleting {amount} messages")
+        await ctx.response.send_message(config.text["clear"])
     except ValueError:
-        await ctx.response.send_message("Incorrect value entered. Amount **must be a digit**")
+        await ctx.response.send_message(config.text["incorrect_value"])
         return
 
     await ctx.channel.purge(limit=amount)
