@@ -13,7 +13,6 @@ with open("conf.json", "r") as f:
     config = Config(json.load(f))
 
 
-
 class Client(discord.Client):
     async def on_ready(self):
         await self.wait_until_ready()
@@ -42,7 +41,7 @@ async def self(ctx: discord.Interaction):
     await ctx.channel.purge(limit=1)
 
     ticket = TicketSystem(interaction=ctx, user_nickname=ctx.user.name)
-    await ticket.create()
+    await ticket.create_opening()
 
 
 @commands.command(name="clear", description=config.commands["clear"])
@@ -52,7 +51,7 @@ async def test(ctx: discord.Interaction, amount: str):
             await ctx.response.send_message(config.text["value_big_or_small"])
             return
         amount = int(amount)
-        await ctx.response.send_message(config.text["clear"])
+        await ctx.response.send_message(config.text["deleting"] + f" {amount} " + config.text["messages"])
     except ValueError:
         await ctx.response.send_message(config.text["incorrect_value"])
         return
