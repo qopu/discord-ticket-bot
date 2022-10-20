@@ -9,7 +9,7 @@ from Tools.Config import Config
 
 TOKEN = Path("token.txt").read_text()  # file gitignored
 
-with open("conf.json", "r") as f:
+with open("conf.json", encoding="utf-8") as f:
     config = Config(json.load(f))
 
 
@@ -36,16 +36,19 @@ commands = app_commands.CommandTree(client)
 
 @commands.command(name="create_ticket_system", description=config.commands["create_ticket_system"])
 async def self(ctx: discord.Interaction):
-    await ctx.response.send_message(config.text["creating_ticket_system"])
-    time.sleep(2)
-    await ctx.channel.purge(limit=1)
+    if ctx.user.guild_permissions.administrator:
+        await ctx.response.send_message(config.text["creating_ticket_system"])
+        time.sleep(2)
+        await ctx.channel.purge(limit=1)
 
-    ticket = TicketSystem(interaction=ctx, user_nickname=ctx.user.name)
-    await ticket.create_opening()
+        ticket = TicketSystem(interaction=ctx, user_nickname=ctx.user.name)
+        await ticket.create_opening()
+    else:
+        await ctx.response.send_message("No permissions!")
 
 
 @commands.command(name="clear", description=config.commands["clear"])
-async def test(ctx: discord.Interaction, amount: str):
+async def clear(ctx: discord.Interaction, amount: str):
     try:
         if not 0 < int(amount) < 1000:
             await ctx.response.send_message(config.text["value_big_or_small"])
@@ -56,7 +59,8 @@ async def test(ctx: discord.Interaction, amount: str):
         await ctx.response.send_message(config.text["incorrect_value"])
         return
 
-    await ctx.channel.purge(limit=amount)
+    if ctx.user.guild_permissions.administrator:
+        await ctx.channel.purge(limit=amount)
 
 
 client.run(TOKEN)

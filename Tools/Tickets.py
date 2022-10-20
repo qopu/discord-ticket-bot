@@ -2,7 +2,7 @@ import discord
 import json
 from Tools.Config import Config
 
-with open("conf.json", "r") as f:
+with open("conf.json", encoding="utf-8") as f:
     config = Config(json.load(f))
 
 
@@ -10,7 +10,7 @@ class OpenMenu(discord.ui.View):
     interaction: discord.Interaction
 
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.value = None
 
     def is_ticket_exists(self, ticket_channel_name):
@@ -35,18 +35,18 @@ class OpenMenu(discord.ui.View):
 
         category = discord.utils.get(self.interaction.guild.categories, name=self.interaction.channel.category.name)
 
-        if self.interaction.user.guild_permissions.manage_channels:
-            await guild.create_text_channel(name='{}'.format(ticket_channel_name), category=category)
-            await self.interaction.response.send_message(config.text["ticket_created"], ephemeral=True)
-            created_ticket = TicketSystem(self.interaction, self.interaction.user.name)
-            await created_ticket.create_closing()
+        await guild.create_text_channel(name='{}'.format(ticket_channel_name), category=category)
+        await self.interaction.response.send_message(config.text["ticket_created"], ephemeral=True)
+        created_ticket = TicketSystem(self.interaction, self.interaction.user.name)
+        await created_ticket.create_closing()
+        await created_ticket.set_permissions()
 
 
 class CloseMenu(discord.ui.View):
     interaction: discord.Interaction
 
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.value = None
 
     @discord.ui.button(label=config.buttons["close_ticket"], style=discord.ButtonStyle.red)
@@ -70,6 +70,12 @@ class TicketSystem:
     async def create_opening(self):
         await self.interaction.channel.send(config.text["create_ticket"], view=OpenMenu())
 
+    async def set_permissions(self):
+        channel = discord.utils.get(self.interaction.guild.channels, name='ticket-' +
+                                                                          self.interaction.user.name.lower())
+        await channel.set_permissions(self.interaction.user, read_messages=True, send_messages=True)
+
     async def create_closing(self):
-        channel = discord.utils.get(self.interaction.guild.channels, name='ticket-' + self.interaction.user.name)
+        channel = discord.utils.get(self.interaction.guild.channels, name='ticket-' +
+                                                                          self.interaction.user.name.lower())
         await channel.send(config.text["close_ticket"], view=CloseMenu())
