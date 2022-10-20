@@ -1,6 +1,7 @@
 # Directories
 venv/
 .idea/
+/Tools/__pycache__
 
 # Files
 token.txt
